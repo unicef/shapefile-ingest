@@ -7,7 +7,8 @@
 
 ##### set up
   `cp config-sample.js config.js`
-  Set directories to download and unzip shapefiles in config.js
+  `bash setup.sh`
+  Zipped shape files will be downloaded directory in data directory.
 
 ##### run
   npm install
