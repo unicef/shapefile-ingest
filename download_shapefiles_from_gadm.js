@@ -39,7 +39,7 @@ bluebird.each(country_codes, function(e) {
 function download_shapefile_then_unzip(country_code){
   return new Promise(function(resolve, reject){
     var url = shapefiles_url + country_code + '_adm_shp.zip';
-    var output = temp_storage + '/' + country_code + '.zip';
+    var output = temp_storage + country_code + '.zip';
     console.log('Downloading', country_code);
     request({
       url: url,
@@ -82,7 +82,7 @@ function unzip(country_code) {
         return reject(err);
       }
       console.log('Begin store to unzip', country_code);
-      var path = temp_storage + '/' + country_code + '.zip';
+      var path = temp_storage + country_code + '.zip';
       extract(path, {dir: shapefile_dir + country_code }, function (err) {
         if (err) {
           return reject(err);
