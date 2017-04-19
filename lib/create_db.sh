@@ -15,5 +15,5 @@ fi
 # # Drop the table if it exists
 psql $1 -c 'DROP TABLE IF EXISTS admin_' + $2 + ';'
 
-echo data/unzipped/$upper/$upper_to_file$2.shp
-shp2pgsql -s 4326 -D -I data/unzipped/$upper/$upper_to_file$2.shp admin_$2_$3 | psql $1
+echo data/unzipped/$upper/$upper_to_file$2
+shp2pgsql -s 4326 -D -I data/unzipped/$upper/$upper_to_file$2 admin_$2_$3 | psql $1
