@@ -38,9 +38,10 @@ bluebird.each(Object.keys(wanted_files), function(country, i) {
  * @param{Integer} admin_level - admin level
  * @return{Promise} Fulfilled when all
  */
-function import_shapefile(country, admin_level) {
+function import_shapefile(country, shapefile) {
   return new Promise((resolve, reject) => {
-    var command = 'bash lib/create_db.sh ' + country.toLowerCase() + ' ' + admin_level + ' ' + shapefile_dir;
+    var admin_level = shapefile.match(/\d/)[0];
+    var command = 'bash lib/create_db.sh ' + country.toLowerCase() + ' ' + shapefile + ' ' + admin_level + ' ' + shapefile_dir;
     console.log(command)
     // resolve();
     exec(command,{maxBuffer: 2048 * 2500}, (err, stdout, stderr) => {
