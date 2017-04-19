@@ -1,5 +1,5 @@
 mkdir -p data/shapefiles
-mkdir -p data/zipped
+mkdir -p data/zipfiles
 check_file() {
   local dir="$1"
   if [ -d "$dir" ]; then
@@ -9,4 +9,4 @@ check_file() {
   fi
 }
 check_file 'data/shapefiles' $SHAPEFILES
-check_file 'data/zipped' $ZIPPED_FILES
+check_file 'data/zipfiles' $ZIPPED_FILES
