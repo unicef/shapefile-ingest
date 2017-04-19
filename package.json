@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.3.0",
     "bluebird": "^3.5.0",
     "child_process": "^1.0.2",
     "extract-zip": "^1.6.0",
