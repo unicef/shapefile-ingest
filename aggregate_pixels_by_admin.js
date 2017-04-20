@@ -158,7 +158,7 @@ function scan_raster(country, admin_table, connectionString, tif_file) {
 }
 
 function drop_raster_table(country, kind) {
-  var command = 'psql $1 -c "DROP TABLE IF EXISTS pop;"'
+  var command = 'bash ./lib/drop_raster_table.sh ' + country + ' ' + kind
   return new Promise((resolve, reject) => {
     exec(command, (err, stdout, stderr) => {
       console.log(stdout)
