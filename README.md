@@ -8,19 +8,20 @@ This is a component of [MagicBox](https://github.com/unicef/magicbox/wiki)
 - Creates a database in postgres for every country
 - Imports the highest admin level shapefile to country database.
 
-##### set up
+##### Set up
 [Install postgres](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04)
-  `sudo apt-get install postgis`
-Install GDAL/OGR on ubuntu
-    sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
-    sudo apt-get install gdal-bin
-  `cp config-sample.js config.js`
+`sudo apt-get install postgis`
+
+Install GDAL/OGR on ubuntu  
+    sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update  
+    sudo apt-get install gdal-bin  
+    cp config-sample.js config.js
 
   `bash setup.sh`
 
   Zipped shape files will be downloaded to directory in data directory.
 
 ##### run
-  npm install
+  npm install  
   - node download_shapefiles_from_gadm.js
   - node import_shapefiles_postgres.js
