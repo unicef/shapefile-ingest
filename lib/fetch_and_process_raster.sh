@@ -8,7 +8,7 @@ fi
 
 if [ ! -f $2$3/$1.zip ]; then
 	wget "http://www.worldpop.org.uk/data/hdx/?dataset=$upper" -O $2$3/$1.zip
-	unzip $2$3/$1.zip -d $2$3/$1
+	unzip -d $2$3/$1 $2$3/$1.zip
         ls $2$3/$1
 fi
 
