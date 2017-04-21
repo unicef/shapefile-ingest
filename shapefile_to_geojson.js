@@ -40,7 +40,7 @@ function prepare_to_geojsonize(country_code) {
  */
 function geojsonize(country_code, admin_level) {
   var input = shapefile_dir + country_code + '/' + country_code + '_adm' + admin_level + '.shp';
-  var output = geojson_dir + country_code + '/' + country_code + '_' + admin_level + '.json';
+  var output = geojson_dir + '/' + country_code + '_' + admin_level + '.json';
   return new Promise((resolve, reject) => {
     if (fs.existsSync(input)) {
       var ogr = ogr2ogr(input);
