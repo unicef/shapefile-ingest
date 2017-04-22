@@ -31,7 +31,7 @@ var source = args.source;
 var json_dir = config[kind].directory + source;//'./data/aggregations/' + kind + '/processed'// + json_src;
 var files = fs.readdirSync(json_dir).filter(f => { return f.match(/j/);});
 
-bluebird.map(files, function(file, i) {
+bluebird.each(files, function(file, i) {
   return upload_blob(file, i);
 }, {concurrency: 1}).catch(function(err) {console.log(err);})
 .then(() => {
