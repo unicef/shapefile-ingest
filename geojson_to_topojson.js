@@ -1,4 +1,4 @@
-// node  node --max_old_space_size=2048 geojson_to_topojson.js -s gadm2-8 -t 0.1
+//  node --max_old_space_size=2048 geojson_to_topojson.js -s gadm2-8 -t 0.1
 var config = require('./config');
 var fs = require('fs');
 var jsonfile = require('jsonfile');
@@ -58,6 +58,7 @@ function process_file(f) {
       },
       function(geojson, callback) {
         var country = f.match(/[A-Z]{3}/)[0]
+        console.log(country)
         var geojson = simplify(geojson, custom_tolerence[country] || tolerance);
         topojsonize(geojson, f)
         .then(callback);
