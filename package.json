@@ -16,7 +16,10 @@
     "mkdirp": "^0.5.1",
     "ogr2ogr": "^1.0.1",
     "pg": "^6.1.5",
-    "request": "^2.81.0"
+    "request": "^2.81.0",
+    "simplify-geojson": "^1.0.3",
+    "topojson": "^3.0.0",
+    "topojson-simplify": "^3.0.1"
   },
   "devDependencies": {
     "eslint": "^3.19.0",
