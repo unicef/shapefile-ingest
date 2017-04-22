@@ -1,9 +1,16 @@
+// node  node --max_old_space_size=2048 geojson_to_topojson.js -s gadm2-8 -t 0.1
 var config = require('./config');
 var fs = require('fs');
 var jsonfile = require('jsonfile');
 var simplify = require('simplify-geojson')
 var topojson = require('topojson');
-
+var custom_tolerence = {
+  AUS: 0.05,
+  BRA: 0.05,
+  CAN: 0.05,
+  FRA: 0.05,
+  BRA: 0.05
+}
 var ArgumentParser = require('argparse').ArgumentParser;
 var bluebird = require('bluebird');
 var async = require('async');
@@ -23,7 +30,7 @@ parser.addArgument(
 
 parser.addArgument(
   ['-t', '--tolerance'],
-  {help: 'Number: in degrees (e.g. lat/lon distance)'}
+  {help: 'Number: in degrees (e.g. lat/lon distance) eg 0.005'}
 );
 
 var args = parser.parseArgs();
@@ -50,7 +57,8 @@ function process_file(f) {
         });
       },
       function(geojson, callback) {
-        var geojson = simplify(geojson, 0.005);
+        var country = f.match(/[A-Z]{3}/)[0]
+        var geojson = simplify(geojson, custom_tolerence[country] || tolerance);
         topojsonize(geojson, f)
         .then(callback);
       }
@@ -62,7 +70,6 @@ function process_file(f) {
 
 function topojsonize(feature_collection, f) {
   return new Promise(function(resolve, reject) {
-    console.log(JSON.stringify(feature_collection).length)
     var c = topojson.topology(
       {collection: feature_collection},
       {
@@ -71,6 +78,7 @@ function topojsonize(feature_collection, f) {
           return object.properties
         }
       });
+
       // var unsimplified = JSON.parse(JSON.stringify(c));  // copy data
       // topojson.simplify(c, {
       //   'coordinate-system': 'spherical',
@@ -79,7 +87,6 @@ function topojsonize(feature_collection, f) {
 
       // topojson.simplify(c, {quantization: '1e4', simplify: '1e-8'})
       jsonfile.writeFile(topo_source_dir + '/' + f, c, (err, data) => {
-        console.log(f, err, data, '!!!')
         resolve();
       });
   });
