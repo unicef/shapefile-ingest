@@ -1,6 +1,6 @@
 This is a component of [MagicBox](https://github.com/unicef/magicbox/wiki)
 
-##### Set up
+#### Set up
     npm install
     cp config-sample.js config.js
     bash setup.sh
@@ -11,11 +11,11 @@ This is a component of [MagicBox](https://github.com/unicef/magicbox/wiki)
 
 `node download_shapefiles_from_gadm.js -s gadm2-8`
 
+Zipped shape files will be downloaded to directory in data directory.
+
 ### Import shapefiles to postgres
 - Creates a database in postgres for every country
 - Imports the highest admin level shapefile to country database.
-
-`node import_shapefiles_to_postgres.js -s gadm2-8`
 
 #### [Install postgres](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04)
 `sudo apt-get install postgis`
@@ -24,9 +24,12 @@ This is a component of [MagicBox](https://github.com/unicef/magicbox/wiki)
 `sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update`  
 `sudo apt-get install gdal-bin`
 
-  Zipped shape files will be downloaded to directory in data directory.
 
-  ### Convert shapefiles to geojson
+`node import_shapefiles_to_postgres.js -s gadm2-8`
+
+
+### Convert shapefiles to geojson
+`node shapefile_to_geojson -s gadm2-8`
 
   `rm  ./data/geojson/gadm2-8/CAN_0.json; ogr2ogr -f GeoJSON data/geojson/gadm2-8/CAN_0.json data/shapefiles/CAN/CAN_adm0.shp`
   `rm  ./data/geojson/gadm2-8/CAN_1.json; ogr2ogr -f GeoJSON data/geojson/gadm2-8/CAN_1.json data/shapefiles/CAN/CAN_adm1.shp`
