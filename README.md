@@ -9,13 +9,13 @@ This is a component of [MagicBox](https://github.com/unicef/magicbox/wiki)
 - Downloads [gadm](http://gadm.org) series 2.8 zipped shapefiles for each country.
 - Unzips them to directory specified in config.js
 
-`node download_shapefiles_from_gadm.js`
+`node download_shapefiles_from_gadm.js -s gadm2-8`
 
 ### Import shapefiles to postgres
 - Creates a database in postgres for every country
 - Imports the highest admin level shapefile to country database.
 
-`node import_shapefiles_postgres.js`
+`node import_shapefiles_to_postgres.js -s gadm2-8`
 
 #### [Install postgres](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04)
 `sudo apt-get install postgis`

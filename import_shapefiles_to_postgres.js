@@ -1,12 +1,28 @@
 // Create a database in postgres for every country
 // Import the highest admin level shapefile to country database.
 
-// nohup node  import_shapefiles_postgres.js -d gadmm2-8> nohup1.out 2>&1&
+//node import_shapefiles_to_postgres.js -s gadm2-8
+var ArgumentParser = require('argparse').ArgumentParser;
 var config = require('./config');
 var fs = require('fs');
 var bluebird = require('bluebird');
 var exec = require('child_process').exec;
-var shapefile_dir = config.shapefile_dir;
+
+var parser = new ArgumentParser({
+  version: '0.0.1',
+  addHelp: true,
+  description: 'Aggregate a csv of airport by admin 1 and 2'
+});
+
+parser.addArgument(
+  ['-s', '--source'],
+  {help: 'Shapefile source. Example: gadm2-8'}
+);
+
+var args = parser.parseArgs();
+var source = args.source;
+var shapefile_dir = config.shapefile_dir + source;
+console.log(shapefile_dir)
 var shapefile_dirs = fs.readdirSync(shapefile_dir);
 
 // Scan each country shapeefile directory for highest admin level shapefile.
