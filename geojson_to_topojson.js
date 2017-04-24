@@ -1,22 +1,6 @@
-//  node --max_old_space_size=2048 geojson_to_topojson.js -s gadm2-8 -t 0.1
+//  node --max_old_space_size=2048 geojson_to_topojson.js -s gadm2-8 -t 0.001
 var config = require('./config');
-var fs = require('fs');
-var jsonfile = require('jsonfile');
-var simplify = require('simplify-geojson')
-var topojson = require('topojson');
-var custom_tolerance = {
-  AUS: 0.005,
-  //BRA: 0.06,
-  //CAN: 0.9,
-  //FRA: 0.9,
-  //USA: 0.005
-}
 var ArgumentParser = require('argparse').ArgumentParser;
-var bluebird = require('bluebird');
-var async = require('async');
-var geojson_dir = config.geojson_dir;
-var topojson_dir = config.topojson_dir;
-
 var parser = new ArgumentParser({
   version: '0.0.1',
   addHelp: true,
@@ -25,7 +9,7 @@ var parser = new ArgumentParser({
 
 parser.addArgument(
   ['-s', '--source'],
-  {help: 'String: shapefile set source'}
+  {help: 'Shapefile source. Example: gadm2-8'}
 );
 
 parser.addArgument(
@@ -36,21 +20,36 @@ parser.addArgument(
 var args = parser.parseArgs();
 var source = args.source;
 var tolerance = args.tolerance;
-var topo_source_dir = topojson_dir + source;
+
+var fs = require('fs');
+var jsonfile = require('jsonfile');
+var simplify = require('simplify-geojson')
+var topojson = require('topojson');
+var custom_tolerence = {
+  AUS: 0.05,
+  BRA: 0.05,
+  CAN: 0.05,
+  FRA: 0.05,
+  BRA: 0.05
+}
+
+var bluebird = require('bluebird');
+var async = require('async');
+
+var shapefile_dir = config.shapefile_dir + source + '/';
+var geojson_dir = config.geojson_dir + source + '/';
+var topojson_dir = config.topojson_dir + source + '/';
 
 
 var geo_files = fs.readdirSync(geojson_dir).filter(f => { return f.match(/json/);})
 
 bluebird.each(geo_files, f => {
-  var country = f.match(/[A-Z]{3}/)[0]
-  console.log(country);
-//  if(!custom_tolerance[country]) { return;  };
-  return process_file(f, country);
+  return process_file(f);
 }, {concurrency: 1}).then(() => {
   console.log('done!');
 });
 
-function process_file(f, country) {
+function process_file(f) {
   return new Promise((resolve, reject) => {
     async.waterfall([
       function(callback) {
@@ -60,8 +59,9 @@ function process_file(f, country) {
         });
       },
       function(geojson, callback) {
-        console.log(country, f, custom_tolerance[country])
-        var geojson = simplify(geojson, custom_tolerance[country] || tolerance);
+        var country = f.match(/[A-Z]{3}/)[0]
+        console.log(country)
+        var geojson = simplify(geojson, custom_tolerence[country] || tolerance);
         topojsonize(geojson, f)
         .then(callback);
       }
@@ -89,7 +89,7 @@ function topojsonize(feature_collection, f) {
       // });
 
       // topojson.simplify(c, {quantization: '1e4', simplify: '1e-8'})
-      jsonfile.writeFile(topo_source_dir + '/' + f, c, (err, data) => {
+      jsonfile.writeFile(topojson_dir + '/' + f, c, (err, data) => {
         resolve();
       });
   });
