@@ -1,6 +1,7 @@
 // node download_shapefiles_from_gadm
 // Downloads shapefiles for all countries.
 // Generates geojson files
+// node download_shapefiles_from_gadm.js -s gadm2-8
 var ArgumentParser = require('argparse').ArgumentParser;
 var bluebird = require('bluebird');
 var config = require('./config');
