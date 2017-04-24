@@ -17,7 +17,7 @@ This is a component of [MagicBox](https://github.com/unicef/magicbox/wiki)
 
 `node import_shapefiles_postgres.js`
 
-[Install postgres](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04)
+[#### Install postgres](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04)
 `sudo apt-get install postgis`
 
 ##### Install GDAL/OGR on ubuntu  
