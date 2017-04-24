@@ -1,5 +1,7 @@
+// node download_shapefiles_from_gadm
 // Downloads shapefiles for all countries.
 // Generates geojson files
+var ArgumentParser = require('argparse').ArgumentParser;
 var bluebird = require('bluebird');
 var config = require('./config');
 var country_codes = require('./resources/country_codes');
@@ -13,6 +15,21 @@ var temp_storage = config.zipfile_dir;
 // Folder where shapefiles o
 var shapefile_dir = config.shapefile_dir;
 var shapefiles_url = config.shapefile_url;
+
+var parser = new ArgumentParser({
+  version: '0.0.1',
+  addHelp: true,
+  description: 'Aggregate a csv of airport by admin 1 and 2'
+});
+
+parser.addArgument(
+  ['-s', '--source'],
+  {help: 'Shapefile source. Example: gadm2-8'}
+);
+var args = parser.parseArgs();
+var source = args.source;
+
+var shapefile_dir = config.shapefile_dir + source
 
 /**
  * Get list of countries you need shapefiles for, then fetch them.
@@ -76,14 +93,14 @@ function download_shapefile_then_unzip(country_code){
  */
 function unzip(country_code) {
   return new Promise(function(resolve, reject) {
-    mkdirp(shapefile_dir + country_code, function(err) {
+    mkdirp(shapefile_dir + '/' + country_code, function(err) {
       if (err){
         console.log(err);
         return reject(err);
       }
       console.log('Begin store to unzip', country_code);
       var path = temp_storage + country_code + '.zip';
-      extract(path, {dir: shapefile_dir + country_code }, function (err) {
+      extract(path, {dir: shapefile_dir + '/' + country_code }, function (err) {
         if (err) {
           return reject(err);
         }
