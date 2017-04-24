@@ -4,12 +4,12 @@ var fs = require('fs');
 var jsonfile = require('jsonfile');
 var simplify = require('simplify-geojson')
 var topojson = require('topojson');
-var custom_tolerence = {
-  AUS: 0.05,
-  BRA: 0.05,
-  CAN: 0.05,
-  FRA: 0.05,
-  BRA: 0.05
+var custom_tolerance = {
+  AUS: 0.005,
+  //BRA: 0.06,
+  //CAN: 0.9,
+  //FRA: 0.9,
+  //USA: 0.005
 }
 var ArgumentParser = require('argparse').ArgumentParser;
 var bluebird = require('bluebird');
@@ -42,12 +42,15 @@ var topo_source_dir = topojson_dir + source;
 var geo_files = fs.readdirSync(geojson_dir).filter(f => { return f.match(/json/);})
 
 bluebird.each(geo_files, f => {
-  return process_file(f);
+  var country = f.match(/[A-Z]{3}/)[0]
+  console.log(country);
+//  if(!custom_tolerance[country]) { return;  };
+  return process_file(f, country);
 }, {concurrency: 1}).then(() => {
   console.log('done!');
 });
 
-function process_file(f) {
+function process_file(f, country) {
   return new Promise((resolve, reject) => {
     async.waterfall([
       function(callback) {
@@ -57,9 +60,8 @@ function process_file(f) {
         });
       },
       function(geojson, callback) {
-        var country = f.match(/[A-Z]{3}/)[0]
-        console.log(country)
-        var geojson = simplify(geojson, custom_tolerence[country] || tolerance);
+        console.log(country, f, custom_tolerance[country])
+        var geojson = simplify(geojson, custom_tolerance[country] || tolerance);
         topojsonize(geojson, f)
         .then(callback);
       }
