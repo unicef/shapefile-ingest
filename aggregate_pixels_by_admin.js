@@ -1,3 +1,4 @@
+// node aggregate_pixels_by_admin.js
 var async = require('async');
 var bluebird = require('bluebird');
 var pg = require('pg');
@@ -47,7 +48,6 @@ function tiff_file_name(content) {
  * @param{String} country - 3 letter country ISO code.
  * @return{Promise} Fulfilled with result of azure upload
  */
-
 function process_country(country) {
   return new Promise((resolve, reject) => {
     async.waterfall([
@@ -57,8 +57,8 @@ function process_country(country) {
         // unzips it before importing it to country db in postgres
         // as table named 'pop'
         var command = 'bash ./lib/fetch_and_process_raster.sh ' + country + ' ' + aggregations_dir + ' human';
+        console.log(command)
         exec(command,{maxBuffer: 4096 * 2500}, (err, stdout, stderr) => {
-          console.log(stdout, '|', stderr);
           var tif_file = tiff_file_name(stdout);
           if (err) {
             console.error(err);
@@ -124,6 +124,7 @@ function scan_raster(country, admin_table, connectionString, tif_file) {
       admin_table.table_name +
       '" LEFT JOIN pop ON ST_Intersects("' + admin_table.table_name +
       '".geom, pop.rast) GROUP BY gid;';
+
       var query = client.query(st);
 
       // Stream results back one row at a time
@@ -138,7 +139,7 @@ function scan_raster(country, admin_table, connectionString, tif_file) {
         var pop_sum = parseInt(results.reduce((s, r) => { return s + r.sum }, 0));
         var kilo_sum = parseInt(results.reduce((s, r) => { return s + r.kilometers}, 0));
         fs.writeFile(aggregations_dir + '/human/processed/' +
-        country + '^' + admin_table.table_name.replace(/^admin/, country) +
+        admin_table.table_name.replace(/^admin/, country) +
         '^' + tif_file +
         '^' + tif_source +
         '^' + pop_sum +
