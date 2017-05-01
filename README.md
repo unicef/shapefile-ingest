@@ -1,9 +1,17 @@
 This is a component of [MagicBox](https://github.com/unicef/magicbox/wiki)
 
-#### Set up
+### Set up
     npm install
     cp config-sample.js config.js
     bash setup.sh
+
+##### [Install postgres](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04)
+`sudo apt-get install postgis`
+
+##### Install GDAL/OGR on ubuntu  
+`sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update`  
+`sudo apt-get install gdal-bin`
+
 
 ## Get shapefiles for all countries from gadm.org
 - Downloads [gadm](http://gadm.org) series 2.8 zipped shapefiles for each country.
@@ -17,15 +25,15 @@ Zipped shape files will be downloaded to directory in data directory.
 - Creates a database in postgres for every country
 - Imports the highest admin level shapefile to country database.
 
-### [Install postgres](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04)
-`sudo apt-get install postgis`
-
-##### Install GDAL/OGR on ubuntu  
-`sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update`  
-`sudo apt-get install gdal-bin`
-
-
 `node import_shapefiles_to_postgres.js -s gadm2-8`
+
+
+## Aggregate country specific rasters by admin
+  Foreach country imported during 'Get shapefiles for all countries from gadm.org':
+  - Downloads country specific raster from worldpop
+  - Imports raster to country db as table 'pop' with raster2pgsql
+  - Aggregates pixels by admin region and summarizes square kilometers per admin.
+
 
 
 ## Convert shapefiles to geojson
