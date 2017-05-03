@@ -36,7 +36,7 @@ parser.addArgument(
 var args = parser.parseArgs();
 var tif = args.tif;
 var tif_source = args.source;
-var shapefile_source = args.source;
+var shapefile_source = args.shapefile;
 var sum_or_mean = args.sum_or_mean;
 
 function execute_command(command) {
