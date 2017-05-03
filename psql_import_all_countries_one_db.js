@@ -14,13 +14,14 @@ var parser = new ArgumentParser({
 });
 
 parser.addArgument(
-  ['-d', '--shapefiles_dir'],
-  {help: 'Name of container with shapefiles to import'}
+  ['-s', '--shapefile_source'],
+  {help: 'Name of shapefile source: gadm2-8'}
 );
 
 var args = parser.parseArgs();
+var shapefile_source = args.shapefile_source;
 // Directory with shapefiles.
-var shapefiles_dir = config.temp_storage + args.shapefiles_dir;
+var shapefiles_dir = config.shapefile_dir + shapefile_source;
 var shapefile_directories = fs.readdirSync(shapefiles_dir);
 
 // Collect all directories with a country iso code like: AFG, ALA, BRA
