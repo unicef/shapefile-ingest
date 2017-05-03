@@ -63,7 +63,7 @@ function import_admins(country, file) {
     var country = file.match(/[A-Z]{3}/)[0];
     console.log(country, admin_level, country,  '!!!!')
 
-    var command = 'bash util/create_db_all_countries.sh ' +
+    var command = 'bash lib/create_db_all_countries.sh ' +
     database +
     ' ' +
     country.toLowerCase() +
