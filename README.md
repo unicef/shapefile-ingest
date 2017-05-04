@@ -1,23 +1,11 @@
 This is a component of [MagicBox](https://github.com/unicef/magicbox/wiki)
 
-#### Set up
+### Set up
     npm install
     cp config-sample.js config.js
     bash setup.sh
 
-### Get shapefiles for all countries from gadm.org
-- Downloads [gadm](http://gadm.org) series 2.8 zipped shapefiles for each country.
-- Unzips them to directory specified in config.js
-
-`node download_shapefiles_from_gadm.js -s gadm2-8`
-
-Zipped shape files will be downloaded to directory in data directory.
-
-### Import shapefiles to postgres
-- Creates a database in postgres for every country
-- Imports the highest admin level shapefile to country database.
-
-#### [Install postgres](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04)
+##### [Install postgres](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04)
 `sudo apt-get install postgis`
 
 ##### Install GDAL/OGR on ubuntu  
@@ -25,10 +13,30 @@ Zipped shape files will be downloaded to directory in data directory.
 `sudo apt-get install gdal-bin`
 
 
+## Get shapefiles for all countries from gadm.org
+- Downloads [gadm](http://gadm.org) series 2.8 zipped shapefiles for each country.
+- Unzips them to directory specified in config.js
+
+`node download_shapefiles_from_gadm.js -s gadm2-8`
+
+Zipped shape files will be downloaded to directory in data directory.
+
+## Import shapefiles to postgres
+- Creates a database in postgres for every country
+- Imports the highest admin level shapefile to country database.
+
 `node import_shapefiles_to_postgres.js -s gadm2-8`
 
 
-### Convert shapefiles to geojson
+## Aggregate country specific rasters by admin
+  Foreach country imported during 'Get shapefiles for all countries from gadm.org':
+  - Downloads country specific raster from worldpop
+  - Imports raster to country db as table 'pop' with raster2pgsql
+  - Aggregates pixels by admin region and summarizes square kilometers per admin.
+
+
+
+## Convert shapefiles to geojson
 `node shapefile_to_geojson -s gadm2-8`
 
   `rm  ./data/geojson/gadm2-8/CAN_0.json; ogr2ogr -f GeoJSON data/geojson/gadm2-8/CAN_0.json data/shapefiles/CAN/CAN_adm0.shp`
