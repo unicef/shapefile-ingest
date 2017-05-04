@@ -116,7 +116,7 @@ async.waterfall([
   }
 ], function() {
   console.log('done!');
-  ss.exit()
+  process.exit()
 });
 
 function scan_raster(country, admin_level, shp_source) {
