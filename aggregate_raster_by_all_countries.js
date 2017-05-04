@@ -6,7 +6,8 @@ var fs = require('fs');
 var ArgumentParser = require('argparse').ArgumentParser;
 var exec = require('child_process').exec;
 var command = 'psql all_countries -c "\\dt" ';
-var config = require('./config').pg_config;
+var config = require('./config');
+var pg_config = config.pg_config;
 var save_to_dir = config.save_to_dir;
 var parser = new ArgumentParser({
   version: '0.0.1',
@@ -38,7 +39,6 @@ var tif = args.tif;
 var tif_source = args.source;
 var shapefile_source = args.shapefile;
 var sum_or_mean = args.sum_or_mean;
-
 function execute_command(command) {
   return new Promise((resolve, reject) => {
     exec(command, (err, stdout, stderr) => {
@@ -126,7 +126,7 @@ function scan_raster(country, admin_level, shp_source) {
   console.log('About to query...');
 
   return new Promise((resolve, reject) => {
-    pg.connect(config, (err, client, done) => {
+    pg.connect(pg_config, (err, client, done) => {
 
       var aggregation = sum_or_mean === 'sum' ? 'SUM((ST_SummaryStats(ST_Clip(rast, geom))).sum)' : '(ST_SummaryStats(ST_Clip(rast, geom))).mean';
 
@@ -174,7 +174,7 @@ function scan_raster(country, admin_level, shp_source) {
         }
 
         // content = content + results.map(r => {return [file, r.sum || 0, r.dpto, r.wcolgen02_, 'col_0_' + r.dpto + '_' + r.wcolgen02_ + '_santiblanko'].join(" ") }).join("\n")
-        fs.writeFile(save_to_dir + shapefile_source + '/' +
+        fs.writeFile(save_to_dir + tif + '/' + tif_source + '/' + shapefile_source + '/' +
         country + '^' + table +
         '^' + tif +
         '^' + tif_source +
