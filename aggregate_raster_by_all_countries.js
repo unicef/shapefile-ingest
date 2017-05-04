@@ -85,7 +85,7 @@ async.waterfall([
   function(callback) {
     console.log('About to add ', tif)
     // Use EPSG:4326 SRS, tile into 100x100 squares, and create an index
-    var command = "raster2pgsql -Y -s 4326 -t 100x100 -I data/aegypti/" + tif + ".tif pop | psql all_countries";
+    var command = "raster2pgsql -Y -s 4326 -t 100x100 -I data/" + tif + '/' + tif + ".tif pop | psql all_countries";
     execute_command(command)
     .then(response => {
       console.log(response);
