@@ -29,7 +29,7 @@ country_table_names()
 function country_table_names() {
   return new Promise((resolve, reject) => {
     var results = [];
-    console.log('About to query...', pg);
+    console.log('About to query...');
     pg.connect(pg_config, (err, client, done) => {
       var st = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
       var query = client.query(st);
@@ -55,8 +55,6 @@ function country_table_names() {
 }
 
 function tiff_file_name(content) {
-  console.log(content)
-  console.log("***#####&&&")
   var ary = content.split(/\//);
   return ary[ary.length-1].replace(/.tif\n/g, '');
 }
