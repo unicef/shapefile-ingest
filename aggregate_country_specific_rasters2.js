@@ -1,4 +1,4 @@
-// node aggregate_country_specific_rasters_by_admin2.js
+// node aggregate_country_specific_rasters2.js
 var async = require('async');
 var bluebird = require('bluebird');
 var pg = require('pg');
@@ -31,7 +31,7 @@ country_table_names()
 function country_table_names() {
   return new Promise((resolve, reject) => {
     var results = [];
-    console.log('About to query...');
+    console.log('About to query...', pg);
     pg.connect(config, (err, client, done) => {
       var st = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
       var query = client.query(st);
@@ -69,7 +69,7 @@ function process_tables(country, country_tables) {
     .then(tif_file => {
       if (!tif_file) { return resolve();}
       bluebird.each(country_tables, table => {
-        return scan_raster(country, table, connectionString, tif_file);
+        return scan_raster(country, table, tif_file);
       }, {concurrency: 1})
       .then(() => {
         exec('rm -r ' + aggregations_dir + 'population/' + country + '*', function (err, stdout, stderr) {
@@ -147,7 +147,7 @@ function form_select_command(admin_table, shapefile_source) {
   }
 }
 
-function scan_raster(country, admin_table, connectionString, tif_file) {
+function scan_raster(country, admin_table, tif_file) {
   return new Promise((resolve, reject) => {
     var results = [];
     config.database = country;
