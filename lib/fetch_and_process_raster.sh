@@ -16,8 +16,22 @@ fi
 psql $1 -c "DROP TABLE IF EXISTS pop;"
 
 # Use EPSG:4326 SRS, tile into 100x100 squares, and create an index
-raster2pgsql -Y -s 4326 -t 100x100 -I $2$3/$1/*.tif pop | psql $1
+raster2pgsql -Y -s 4326 -t 100x100 -I $2$3/$1/*.tif pop | psql all_countries
+
+# create ../../rasters/population/afg/
+if [ ! -d $4$1 ]; then
+  mkdir $4$1
+fi
+
 file=$2$3/$1/*.tif
+echo $file "@@@@@@@"
+if [ -f $file ]; then
+  echo "File exists! $file"
+  fbname=$(basename $file)
+  echo $fbname
+  cp $file $4$1/$fbname
+fi
+# DO NOT REMOVE OR EDIT THIS LINE
 echo $file
 #SELECT gid, admin.name_1, admin.name_2, SUM((ST_SummaryStats(ST_Clip(rast, geom))).sum) FROM admin  LEFT JOIN pop ON ST_Intersects(admin.geom, pop.rast) GROUP BY gid;
 
