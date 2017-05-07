@@ -12,8 +12,6 @@ var save_raster_dir = config.save_raster_dir;
 // var command = 'psql -l -t | cut -d'|' -f1 ';
 var command = "psql -lqt  | grep _";
 var pg_config = config.pg_config;
-var connectionString = 'postgres://localhost:5432/all_countries';
-config.database = 'all_countries';
 
 // Get array of 3 letter iso country codes for which a db exists in postgres.
 country_table_names()
@@ -32,7 +30,7 @@ function country_table_names() {
   return new Promise((resolve, reject) => {
     var results = [];
     console.log('About to query...', pg);
-    pg.connect(config, (err, client, done) => {
+    pg.connect(pg_config, (err, client, done) => {
       var st = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
       var query = client.query(st);
       // Stream results back one row at a time
