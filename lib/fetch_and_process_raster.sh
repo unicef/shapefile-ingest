@@ -18,14 +18,15 @@ psql $1 -c "DROP TABLE IF EXISTS pop;"
 # Use EPSG:4326 SRS, tile into 100x100 squares, and create an index
 raster2pgsql -Y -s 4326 -t 100x100 -I $2$3/$1/*.tif pop | psql all_countries
 
-# create ../../rasters/population/afg/
-if [ ! -d $4$1 ]; then
-  mkdir $4$1
-fi
+
 
 file=$2$3/$1/*.tif
-echo $file "@@@@@@@"
+
 if [ -f $file ]; then
+  # create ../../rasters/population/afg/
+  if [ ! -d $4$1 ]; then
+    mkdir $4$1
+  fi  
   echo "File exists! $file"
   fbname=$(basename $file)
   echo $fbname
