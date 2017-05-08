@@ -17,7 +17,6 @@ var pg_config = config.pg_config;
 country_table_names()
 .then(tables => {
   bluebird.each(Object.keys(tables).filter(c => { return c.match(/col/);}), (country, i) => {
-    console.log(country, i, '!!!!')
     return process_tables(country, tables[country]).then(() => {
       // Drop raster from table if exists
       drop_raster_table('all_countries', 'pop');
@@ -45,7 +44,12 @@ function country_table_names() {
           .map(r => { return r.table_name})
           .reduce((h, e) => {
             var country = e.match(/[a-z]{3}/)[0];
-            h[country] = h[country] ? h[country].push(e) : [e];
+            if (h[country]) {
+              h[country].push(e);
+            } else {
+              h[country] = [e];
+            }
+            //h[country] = h[country] ? h[country].push(e) : [e];
             return h;
           }, {})
         );
@@ -64,6 +68,7 @@ function process_tables(country, country_tables) {
     fetch_raster(country)
     .then(tif_file => {
       if (!tif_file) { return resolve();}
+      console.log(country_tables, '!!!!');
       bluebird.each(country_tables, table => {
         return scan_raster(country, table, tif_file);
       }, {concurrency: 1})
