@@ -16,7 +16,7 @@ var pg_config = config.pg_config;
 // Get array of 3 letter iso country codes for which a db exists in postgres.
 country_table_names()
 .then(tables => {
-  bluebird.each(Object.keys(tables).filter(c => { return c.match(/col/);}), (country, i) => {
+  bluebird.each(Object.keys(tables), (country, i) => {
     return process_tables(country, tables[country]).then(() => {
       // Drop raster from table if exists
       drop_raster_table('all_countries', 'pop');
@@ -142,7 +142,8 @@ function form_select_command(admin_table, shapefile_source) {
       return st;
       break
     case 'santiblanko':
-      return "SELECT ST_Area(col_2_santiblanko.wkb_geometry::geography)/1609.34^2 AS kilometers, dpto as id_1, wcolgen02_ as id_2, SUM((ST_SummaryStats(ST_Clip(rast, wkb_geometry, -9999))).sum) FROM col_2_santiblanko LEFT JOIN pop ON ST_Intersects(col_2_santiblanko.wkb_geometry, pop.rast) GROUP BY id_1, id_2, kilometers;"
+      // return "SELECT ST_Area(col_2_santiblanko.wkb_geometry::geography)/1609.34^2 AS kilometers, dpto, wcolgen02_ as id_2, SUM((ST_SummaryStats(ST_Clip(rast, wkb_geometry, -9999))).sum) FROM col_2_santiblanko LEFT JOIN pop ON ST_Intersects(col_2_santiblanko.wkb_geometry, pop.rast) GROUP BY id_1, id_2, kilometers;"
+      return "SELECT ST_Area(col_2_santiblanko.wkb_geometry::geography)/1609.34^2 AS kilometers, dpto, wcolgen02_, SUM((ST_SummaryStats(ST_Clip(rast, wkb_geometry, -9999))).sum) FROM col_2_santiblanko LEFT JOIN pop ON ST_Intersects(col_2_santiblanko.wkb_geometry, pop.rast) GROUP BY dpto, wcolgen02_, kilometers;"
     default:
       return st;
   }
