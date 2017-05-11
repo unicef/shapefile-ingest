@@ -58,6 +58,7 @@ function process_country(country) {
         // as table named 'pop'
         var command = 'bash ./lib/fetch_and_process_raster.sh ' + country + ' ' + aggregations_dir + ' human';
         console.log(command)
+
         exec(command,{maxBuffer: 4096 * 2500}, (err, stdout, stderr) => {
           var tif_file = tiff_file_name(stdout);
           if (err) {
