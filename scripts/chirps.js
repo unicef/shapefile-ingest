@@ -1,28 +1,57 @@
+// node scripts/chirps -s ../../rasters/precipitation/chirps
 var async = require('async');
+var ArgumentParser = require('argparse').ArgumentParser;
 var bluebird = require('bluebird');
 var moment = require('moment');
 var config = require('../config');
-var ftp = require('ftp-get')
+var ftp = require('ftp-get');
+var fs = require('fs');
 var targz = require('targz');
 var fs = require('fs');
 var exec = require('child_process').exec;
-var save_to_dir = config.save_to_dir + 'precipitation/chirps/'
+var save_to_dir = config.save_to_dir + 'precipitation2/chirps/'
+
+var parser = new ArgumentParser({
+  version: '0.0.1',
+  addHelp: true,
+  description: 'Aggregate a csv of airport by admin 1 and 2'
+});
+
+parser.addArgument(
+  ['-s', '--store'],
+  {help: 'Directory to save zipped raster'}
+);
+
+parser.addArgument(
+  ['-y', '--year'],
+  {help: 'Year to process'}
+);
+
+var args = parser.parseArgs();
+var raster_store = args.store;
 
 function download(obj) {
   return new Promise((resolve, reject) => {
     async.waterfall([
       function(callback) {
-        console.log(obj.url)
-        ftp.get(obj.url,  obj.dir + obj.file_name, function (err, res) {
-          if (err) {
-            console.log(err, '****')
+        fs.exists(obj.dir + obj.file_name, function(exists) {
+          if (!exists) {
+            console.log('gzip does not exist');
+            ftp.get(obj.url,  obj.dir + obj.file_name, function (err, res) {
+              if (err) {
+                console.log(err)
+              }
+              callback();
+            })
+          } else {
+            console.log('gzip exists');
+            callback();
           }
-          callback();
-        })
+        });
       },
 
       function(callback) {
-        var command = 'gunzip ' + save_to_dir + obj.file_name;
+        var command = 'gunzip -c ' + raster_store + obj.file_name + ' > ' + save_to_dir + obj.file_name.replace(/.gz/, '') ;
         exec(command, (err, stdout, stderr) => {
           if (err) {
             console.error(err);
@@ -32,9 +61,9 @@ function download(obj) {
       },
 
       function(callback) {
-        var command = 'node aggregate_raster_by_all_countries.js --tif ' + obj.day + ' -s chirps -k precipitation -m mean';
+        var command = 'node aggregate_raster_by_all_countries.js --tif ' + obj.day + ' -s chirps -k precipitation2 -m mean';
         console.log(command);
-        exec(command, (err, stdout, stderr) => {
+        exec(command, {maxBuffer: 8192 * 5000}, (err, stdout, stderr) => {
           if (err) {
             console.error(err);
           }
@@ -62,7 +91,7 @@ function download(obj) {
 
 var dates = [];
 var c = 0;
-var year = 2017;
+var year = year;
 var file_type = '.tif.gz';
 
 while(c < 365) {
@@ -77,7 +106,8 @@ while(c < 365) {
     {
       url: url,
       type: file_type,
-      dir: save_to_dir,
+      // dir: save_to_dir,
+      dir: raster_store,
       day: day,
       year: year,
       file_name: day + file_type
@@ -89,5 +119,6 @@ bluebird.each(dates, (obj, index) => {
   return download(obj);
 }, {concurrency: 1})
 .then(() => {
-  console.log('done with all')
+  console.log('done with all');
+  process.exit();
 })
