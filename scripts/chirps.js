@@ -28,7 +28,8 @@ parser.addArgument(
 );
 
 var args = parser.parseArgs();
-var raster_store = args.store;
+var raster_store = args.store + '/';
+var year = args.year;
 
 function download(obj) {
   return new Promise((resolve, reject) => {
