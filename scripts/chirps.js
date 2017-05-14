@@ -1,4 +1,4 @@
-// node scripts/chirps -s ../../rasters/precipitation/chirps
+// node scripts/chirps -s ../../rasters/precipitation/chirps -y 2017
 var async = require('async');
 var ArgumentParser = require('argparse').ArgumentParser;
 var bluebird = require('bluebird');
@@ -10,6 +10,7 @@ var targz = require('targz');
 var fs = require('fs');
 var exec = require('child_process').exec;
 var save_to_dir = config.save_to_dir + 'precipitation2/chirps/'
+var aggregate_raster = require('../aggregate_raster_by_all_countries');
 
 var parser = new ArgumentParser({
   version: '0.0.1',
@@ -35,6 +36,8 @@ function download(obj) {
   return new Promise((resolve, reject) => {
     async.waterfall([
       function(callback) {
+        // Check if zipped raster has been downloaded
+        // If not, download it and save to rasters save directory.
         fs.exists(obj.dir + obj.file_name, function(exists) {
           if (!exists) {
             console.log('gzip does not exist');
@@ -52,6 +55,7 @@ function download(obj) {
       },
 
       function(callback) {
+        // Unzip raster to another directory to be imported to postgres
         var command = 'gunzip -c ' + raster_store + obj.file_name + ' > ' + save_to_dir + obj.file_name.replace(/.gz/, '') ;
         exec(command, (err, stdout, stderr) => {
           if (err) {
@@ -62,15 +66,21 @@ function download(obj) {
       },
 
       function(callback) {
-        var command = 'node aggregate_raster_by_all_countries.js --tif ' + obj.day + ' -s chirps -k precipitation2 -m mean';
-        console.log(command);
-        exec(command, {maxBuffer: 8192 * 5000}, (err, stdout, stderr) => {
-          if (err) {
-            console.error(err);
-          }
+        aggregate_raster.aggregate_raster_by_all_countries(obj.day, 'chirps', 'precipitation2', 'mean')
+        .then(() => {
           callback();
-        });
+        })
       },
+      // function(callback) {
+      //   var command = 'node aggregate_raster_by_all_countries.js --tif ' + obj.day + ' -s chirps -k precipitation2 -m mean';
+      //   console.log(command);
+      //   exec(command, {maxBuffer: 8192 * 5000}, (err, stdout, stderr) => {
+      //     if (err) {
+      //       console.error(err);
+      //     }
+      //     callback();
+      //   });
+      // },
 
       function(callback) {
         var command = 'rm ' + save_to_dir + obj.file_name.replace(/.gz/, '');
