@@ -86,6 +86,7 @@ function process_tables(country, country_tables, tif, kind, tif_source) {
 }
 
 exports.aggregate_raster_by_all_countries = (tif, tif_source, kind, sum_or_mean) => {
+  console.log('Processing', tif)
   return new Promise((resolve, reject) => {
     async.waterfall([
       // Drop table pop if exists
