@@ -107,7 +107,7 @@ var year = date.year();
 
 var total_days = moment(String(year) + '-12-31').diff(date, 'days')
 while(c < total_days) {
-  var day = date.add(1, 'days').format('YYYY.MM.DD');
+  var day = date.add(c, 'days').format('YYYY.MM.DD');
   var url = 'ftp://chg-ftpout.geog.ucsb.edu/pub/org/chg/products/CHIRPS-2.0/global_daily/tifs/p05/' + year + '/chirps-v2.0.' + day + file_type;
 
   dates.push(
