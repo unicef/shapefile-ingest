@@ -71,7 +71,7 @@ function execute_command(command) {
   });
 }
 
-function process_tables(country, country_tables, tif, kind, tif_source) {
+function process_tables(country, country_tables, tif, kind, tif_source, sum_or_mean) {
   return new Promise((resolve, reject) => {
     bluebird.each(country_tables, table => {
       return mkdir(table, kind, tif_source)
