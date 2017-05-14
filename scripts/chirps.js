@@ -1,4 +1,4 @@
-// node scripts/chirps -s ../../rasters/precipitation/chirps -y 2017
+// node scripts/chirps -s ../../rasters/precipitation/chirps -y 2017-01-01
 var async = require('async');
 var ArgumentParser = require('argparse').ArgumentParser;
 var bluebird = require('bluebird');
@@ -9,7 +9,7 @@ var fs = require('fs');
 var targz = require('targz');
 var fs = require('fs');
 var exec = require('child_process').exec;
-var save_to_dir = config.save_to_dir + 'precipitation2/chirps/'
+var save_to_dir = config.save_to_dir + 'precipitation/chirps/'
 var aggregate_raster = require('../aggregate_raster_by_all_countries');
 
 var parser = new ArgumentParser({
@@ -66,13 +66,13 @@ function download(obj) {
       },
 
       function(callback) {
-        aggregate_raster.aggregate_raster_by_all_countries(obj.day, 'chirps', 'precipitation2', 'mean')
+        aggregate_raster.aggregate_raster_by_all_countries(obj.day, 'chirps', 'precipitation', 'mean')
         .then(() => {
           callback();
         })
       },
       // function(callback) {
-      //   var command = 'node aggregate_raster_by_all_countries.js --tif ' + obj.day + ' -s chirps -k precipitation2 -m mean';
+      //   var command = 'node aggregate_raster_by_all_countries.js --tif ' + obj.day + ' -s chirps -k precipitation -m mean';
       //   console.log(command);
       //   exec(command, {maxBuffer: 8192 * 5000}, (err, stdout, stderr) => {
       //     if (err) {
@@ -103,7 +103,7 @@ function download(obj) {
 var dates = [];
 var c = 0;
 var file_type = '.tif.gz';
-
+var year = m(date).year()
 while(c < 365) {
   var day = moment(date).add(c, 'days').format('YYYY.MM.DD');
   // if (day === moment('2015-11-01').format('YYYY.MM.DD')) {
