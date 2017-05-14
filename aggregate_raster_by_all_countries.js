@@ -76,7 +76,7 @@ function process_tables(country, country_tables, tif, kind, tif_source) {
     bluebird.each(country_tables, table => {
       return mkdir(table, kind, tif_source)
       .then(() => {
-        return scan_raster(country, table, tif, kind, tif_source);
+        return scan_raster(country, table, tif, kind, tif_source, sum_or_mean);
       })
     }, {concurrency: 1})
     .then(() => {
@@ -158,7 +158,7 @@ function scan_raster(country, admin_table, tif,  kind, tif_source, sum_or_mean) 
       query.on('end', () => {
        // var pop_sum = parseInt(results.reduce((s, r) => { return s + r.sum }, 0));
         var kilo_sum = parseInt(results.reduce((s, r) => { return s + r.kilometers}, 0));
-        var results2 = results.map(e => { console.log(e, '***', sum_or_mean, e[sum_or_mean]) ;return e[sum_or_mean];});
+        var results2 = results.map(e => { console.log(e, '***', sum_or_mean, e[sum_or_mean]); return e[sum_or_mean];});
 
         var sum = 0;
         var amount = null;
