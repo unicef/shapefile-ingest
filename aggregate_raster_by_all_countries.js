@@ -121,7 +121,7 @@ exports.aggregate_raster_by_all_countries = (tif, tif_source, kind, sum_or_mean)
             return process_tables(country, tables[country], tif, kind, tif_source, sum_or_mean).then(() => {
             });
           }, {concurrency: 1})
-          .then(process.exit);
+          .then(callback);
         });
       },
 
