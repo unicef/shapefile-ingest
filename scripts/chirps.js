@@ -103,7 +103,7 @@ function download(obj) {
 var dates = [];
 var c = 0;
 var file_type = '.tif.gz';
-var year = m(date).year()
+var year = moment(date).year()
 while(c < 365) {
   var day = moment(date).add(c, 'days').format('YYYY.MM.DD');
   // if (day === moment('2015-11-01').format('YYYY.MM.DD')) {
