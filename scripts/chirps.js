@@ -1,4 +1,4 @@
-// node scripts/chirps -s ../../rasters/precipitation/chirps -y 2017-01-01
+// node scripts/chirps -s ../../rasters/precipitation/chirps -d 2017-01-11
 var async = require('async');
 var ArgumentParser = require('argparse').ArgumentParser;
 var bluebird = require('bluebird');
@@ -30,7 +30,7 @@ parser.addArgument(
 
 var args = parser.parseArgs();
 var raster_store = args.store + '/';
-var date = args.date;
+var date = moment(args.date);
 
 function download(obj) {
   return new Promise((resolve, reject) => {
@@ -103,13 +103,11 @@ function download(obj) {
 var dates = [];
 var c = 0;
 var file_type = '.tif.gz';
-var year = moment(date).year()
-while(c < 365) {
-  var day = moment(date).add(c, 'days').format('YYYY.MM.DD');
-  // if (day === moment('2015-11-01').format('YYYY.MM.DD')) {
-  //   file_type = '.tif';
-  //   var dir = './data/tif/';
-  // }
+var year = date.year();
+
+var total_days = moment(String(year) + '-12-31').diff(date, 'days')
+while(c < total_days) {
+  var day = date.add(1, 'days').format('YYYY.MM.DD');
   var url = 'ftp://chg-ftpout.geog.ucsb.edu/pub/org/chg/products/CHIRPS-2.0/global_daily/tifs/p05/' + year + '/chirps-v2.0.' + day + file_type;
 
   dates.push(
