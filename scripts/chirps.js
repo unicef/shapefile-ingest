@@ -24,13 +24,13 @@ parser.addArgument(
 );
 
 parser.addArgument(
-  ['-y', '--year'],
-  {help: 'Year to process'}
+  ['-d', '--date'],
+  {help: 'date to process: YYYY-MM-DD'}
 );
 
 var args = parser.parseArgs();
 var raster_store = args.store + '/';
-var year = args.year;
+var date = args.date;
 
 function download(obj) {
   return new Promise((resolve, reject) => {
@@ -102,11 +102,10 @@ function download(obj) {
 
 var dates = [];
 var c = 0;
-var year = year;
 var file_type = '.tif.gz';
 
 while(c < 365) {
-  var day = moment(year + '-01-01').add(c, 'days').format('YYYY.MM.DD');
+  var day = moment(date).add(c, 'days').format('YYYY.MM.DD');
   // if (day === moment('2015-11-01').format('YYYY.MM.DD')) {
   //   file_type = '.tif';
   //   var dir = './data/tif/';
