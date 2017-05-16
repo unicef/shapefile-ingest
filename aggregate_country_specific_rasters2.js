@@ -18,7 +18,7 @@ var pg_config = config.pg_config;
 table_names.country_table_names(pg_config)
 .then(tables => {
 
-  bluebird.each(Object.keys(tables).filter( t => { return t.match(/sle/)}), (country, i) => {
+  bluebird.each(Object.keys(tables), (country, i) => {
     return process_tables(country, tables[country]).then(() => {
       // Drop raster from table if exists
       drop_raster_table('all_countries', 'pop');
