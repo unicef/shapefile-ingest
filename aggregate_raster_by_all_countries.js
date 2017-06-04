@@ -53,10 +53,14 @@ var sum_or_mean = args.sum_or_mean;
 function mkdir(table, kind, tif_source) {
   [country, admin_level, shp_source] = table.split(/_/);
   return new Promise((resolve, reject) => {
-    mkdirp(save_to_dir + kind + '/' + tif_source + '/' + shp_source + '/' + country, function (err) {
-        if (err) console.error(err)
-        else resolve();
-    });
+    if (kind.match(/precipitation/)) {
+      mkdirp(save_to_dir + kind + '/' + tif_source + '/' + shp_source + '/' + country, function (err) {
+          if (err) console.error(err)
+          else resolve();
+      });
+    } else {
+      resolve();
+    }
   })
 }
 
