@@ -82,7 +82,7 @@ function process_tables(country, country_tables, tif, kind, tif_source, sum_or_m
       return mkdir(table, kind, tif_source)
       .then(() => {
         return scan_raster(country, table, tif, kind, tif_source, sum_or_mean);
-      })
+      });
     }, {concurrency: 1})
     .then(() => {
       resolve();
@@ -120,7 +120,6 @@ exports.aggregate_raster_by_all_countries = (tif, tif_source, kind, sum_or_mean)
         console.log(command);
         execute_command(command)
         .then(response => {
-          console.log(response);
           callback();
         });
       },
@@ -130,6 +129,7 @@ exports.aggregate_raster_by_all_countries = (tif, tif_source, kind, sum_or_mean)
         table_names.country_table_names(pg_config)
         .then(tables => {
           bluebird.each(Object.keys(tables), (country, i) => {
+            console.log(country, '*****', tables[country])
             return process_tables(country, tables[country], tif, kind, tif_source, sum_or_mean).then(() => {
             });
           }, {concurrency: 1})
@@ -154,7 +154,10 @@ exports.aggregate_raster_by_all_countries = (tif, tif_source, kind, sum_or_mean)
 }
 
 this.aggregate_raster_by_all_countries(tif, tif_source, kind, sum_or_mean)
-.then(process.exit)
+.then(() => {
+  console.log('All complete!');
+  process.exit();
+})
 
 function scan_raster(country, admin_table, tif,  kind, tif_source, sum_or_mean) {
   var results = [];
@@ -203,7 +206,11 @@ function scan_raster(country, admin_table, tif,  kind, tif_source, sum_or_mean) 
         '^' + kilo_sum +
         '.json',
         JSON.stringify(results), (err) => {
-          if (err) console.log(err)
+          if (err) {
+            console.log(err);
+            console.log('Please manually create this dir.');
+            process.exit();
+          }
           console.log('done!', country, admin_table)
           done();
           resolve();
