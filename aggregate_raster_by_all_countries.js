@@ -1,10 +1,10 @@
-// node aggregate_raster_by_all_countries.js --tif aegypti -s simon_hay -m mean -f gadm2-8
+// node aggregate_raster_by_all_countries.js -k aegypti --tif aegypti -s simon_hay -m mean -f gadm2-8
 // node aggregate_raster_by_all_countries.js --tif 2015.01.02.tif -s chirps -k precipitation -m mean
 var async = require('async');
 var bluebird = require('bluebird');
 var pg = require('pg');
 var fs = require('fs');
-// var ArgumentParser = require('argparse').ArgumentParser;
+var ArgumentParser = require('argparse').ArgumentParser;
 var exec = require('child_process').exec;
 var command = 'psql all_countries -c "\\dt" ';
 var config = require('./config');
@@ -13,42 +13,42 @@ var pg_config = config.pg_config;
 var save_to_dir = config.save_to_dir;
 var table_names = require('./shared/table_names');
 
-// var parser = new ArgumentParser({
-//   version: '0.0.1',
-//   addHelp: true,
-//   description: 'Aggregate a csv of airport by admin 1 and 2'
-// });
-//
-// parser.addArgument(
-//   ['-t', '--tif'],
-//   {help: 'Name of tif to import'}
-// );
-// parser.addArgument(
-//   ['-s', '--source'],
-//   {help: 'Source of tif to import'}
-// );
-//
-// parser.addArgument(
-//   ['-k', '--kind'],
-//   {help: 'population, egypti, or precipitation'}
-// )
-//
-// parser.addArgument(
-//   ['-m', '--sum_or_mean'],
-//   {help: 'sum or mean'}
-// )
+var parser = new ArgumentParser({
+  version: '0.0.1',
+  addHelp: true,
+  description: 'Aggregate a csv of airport by admin 1 and 2'
+});
 
-// parser.addArgument(
-//   ['-f', '--shapefile'],
-//   {help: 'Shapefile source: gadm2-8'}
-// )
+parser.addArgument(
+  ['-t', '--tif'],
+  {help: 'Name of tif to import'}
+);
+parser.addArgument(
+  ['-s', '--source'],
+  {help: 'Source of tif to import'}
+);
 
-// var args = parser.parseArgs();
-// var tif = args.tif;
-// var kind = args.kind;
-// var tif_source = args.source;
-// // var shapefile_source = args.shapefile;
-// var sum_or_mean = args.sum_or_mean;
+parser.addArgument(
+  ['-k', '--kind'],
+  {help: 'population, egypti, or precipitation'}
+)
+
+parser.addArgument(
+  ['-m', '--sum_or_mean'],
+  {help: 'sum or mean'}
+)
+
+parser.addArgument(
+  ['-f', '--shapefile'],
+  {help: 'Shapefile source: gadm2-8'}
+)
+
+var args = parser.parseArgs();
+var tif = args.tif;
+var kind = args.kind;
+var tif_source = args.source;
+// var shapefile_source = args.shapefile;
+var sum_or_mean = args.sum_or_mean;
 
 function mkdir(table, kind, tif_source) {
   [country, admin_level, shp_source] = table.split(/_/);
@@ -74,6 +74,7 @@ function execute_command(command) {
 function process_tables(country, country_tables, tif, kind, tif_source, sum_or_mean) {
   return new Promise((resolve, reject) => {
     bluebird.each(country_tables, table => {
+      // Create direcotry for country if doesn't exist.
       return mkdir(table, kind, tif_source)
       .then(() => {
         return scan_raster(country, table, tif, kind, tif_source, sum_or_mean);
@@ -86,6 +87,7 @@ function process_tables(country, country_tables, tif, kind, tif_source, sum_or_m
 }
 
 exports.aggregate_raster_by_all_countries = (tif, tif_source, kind, sum_or_mean) => {
+  console.log(tif, tif_source, kind, sum_or_mean)
   console.log('Processing', tif)
   return new Promise((resolve, reject) => {
     async.waterfall([
@@ -93,6 +95,7 @@ exports.aggregate_raster_by_all_countries = (tif, tif_source, kind, sum_or_mean)
       function(callback) {
         // Use EPSG:4326 SRS, tile into 100x100 squares, and create an index
         var command = 'psql all_countries -c "DROP TABLE IF EXISTS pop"';
+        console.log(command);
         execute_command(command)
         .then(response => {
           console.log(response);
@@ -102,9 +105,14 @@ exports.aggregate_raster_by_all_countries = (tif, tif_source, kind, sum_or_mean)
 
       // Import raster to database
       function(callback) {
-        console.log('About to add ', tif)
+        console.log('About to add', tif)
         // Use EPSG:4326 SRS, tile into 100x100 squares, and create an index
-        var command = "raster2pgsql -Y -s 4326 -t 100x100 -I " + save_to_dir + kind + '/' + tif_source + '/' + tif + ".tif pop | psql all_countries";
+
+        var path = save_to_dir + kind + '/' + tif_source + '/';
+        if (kind.match(/(aegypti|albopictus)/)) {
+          path = config[kind].local + '/';
+        }
+        var command = "raster2pgsql -Y -s 4326 -t 100x100 -I " + path + tif + ".tif pop | psql all_countries";
         console.log(command);
         execute_command(command)
         .then(response => {
@@ -141,6 +149,9 @@ exports.aggregate_raster_by_all_countries = (tif, tif_source, kind, sum_or_mean)
   })
 }
 
+this.aggregate_raster_by_all_countries(tif, tif_source, kind, sum_or_mean)
+.then(process.exit)
+
 function scan_raster(country, admin_table, tif,  kind, tif_source, sum_or_mean) {
   var results = [];
   console.log('About to query...');
@@ -159,7 +170,7 @@ function scan_raster(country, admin_table, tif,  kind, tif_source, sum_or_mean) 
       query.on('end', () => {
        // var pop_sum = parseInt(results.reduce((s, r) => { return s + r.sum }, 0));
         var kilo_sum = parseInt(results.reduce((s, r) => { return s + r.kilometers}, 0));
-        var results2 = results.map(e => { console.log(e, '***', sum_or_mean, e[sum_or_mean]); return e[sum_or_mean];});
+        var results2 = results.map(e => { return e[sum_or_mean];});
 
         var sum = 0;
         var amount = null;
