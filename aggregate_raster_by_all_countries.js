@@ -110,7 +110,7 @@ exports.aggregate_raster_by_all_countries = (tif, tif_source, kind, sum_or_mean)
 
         var path = save_to_dir + kind + '/' + tif_source + '/';
         if (kind.match(/(aegypti|albopictus)/)) {
-          path = config[kind].local + '/';
+          path = config[kind].local
         }
         var command = "raster2pgsql -Y -s 4326 -t 100x100 -I " + path + tif + ".tif pop | psql all_countries";
         console.log(command);
