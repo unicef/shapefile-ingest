@@ -187,7 +187,11 @@ function scan_raster(country, admin_table, tif,  kind, tif_source, sum_or_mean) 
         }
 
         // content = content + results.map(r => {return [file, r.sum || 0, r.dpto, r.wcolgen02_, 'col_0_' + r.dpto + '_' + r.wcolgen02_ + '_santiblanko'].join(" ") }).join("\n")
-        fs.writeFile(save_to_dir + kind + '/' + tif_source + '/' + shp_source + '/' + country + '/' +
+        var path = save_to_dir + kind + '/' + tif_source + '/' + shp_source + '/';
+        if (kind.match(/precipitation/)) {
+          path += country + '/'
+        }
+        fs.writeFile(path  +
         admin_table +
         '^' + tif +
         '^' + tif_source +
