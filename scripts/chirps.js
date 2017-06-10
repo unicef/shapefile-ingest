@@ -6,8 +6,6 @@ var moment = require('moment');
 var config = require('../config');
 var ftp = require('ftp-get');
 var fs = require('fs');
-var targz = require('targz');
-var fs = require('fs');
 var exec = require('child_process').exec;
 var save_to_dir = config.save_to_dir + 'precipitation/chirps/'
 var aggregate_raster = require('../aggregate_raster_by_all_countries');
@@ -65,12 +63,12 @@ function download(obj) {
         });
       },
 
-      function(callback) {
-        aggregate_raster.aggregate_raster_by_all_countries(obj.day, 'chirps', 'precipitation', 'mean')
-        .then(() => {
-          callback();
-        })
-      },
+      // function(callback) {
+      //   aggregate_raster.aggregate_raster_by_all_countries(obj.day, 'chirps', 'precipitation', 'mean')
+      //   .then(() => {
+      //     callback();
+      //   })
+      // },
       // function(callback) {
       //   var command = 'node aggregate_raster_by_all_countries.js --tif ' + obj.day + ' -s chirps -k precipitation -m mean';
       //   console.log(command);
