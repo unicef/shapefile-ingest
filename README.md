@@ -21,19 +21,26 @@ This is a component of [MagicBox](https://github.com/unicef/magicbox/wiki)
 
 Zipped shape files will be downloaded to directory in data directory.
 
+## Get shapeefile for Colombia from Santiblanko
+  clone repo: https://github.com/santiblanko/colombia.geojson
+  `shp2pgsql -s 4326 -D -I santiblanko/mpio.shp col_2_santiblanko | psql all_countries`
+
 ## Import shapefiles to postgres
 - Creates a database in postgres for every country
 - Imports the highest admin level shapefile to country database.
-
+  // ogr2ogr -f "PostgreSQL" PG:"dbname=all_countries  user=postgres" "mpio.json"  -nln col_2_santiblanko
 `node import_shapefiles_to_postgres.js -s gadm2-8`
 
 
 ## Aggregate country specific rasters by admin
+Currently used for aggregating rasters by country from worldpop
   Foreach country imported during 'Get shapefiles for all countries from gadm.org':
   - Downloads country specific raster from worldpop
   - Imports raster to country db as table 'pop' with raster2pgsql
   - Aggregates pixels by admin region and summarizes square kilometers per admin.
 
+## Aggregate raster by all countries
+  // node aggregate_raster_by_all_countries.js --tif aegypti -s simon_hay -m mean -f gadm2-8
 
 
 ## Convert shapefiles to geojson
