@@ -8,7 +8,7 @@ var ftp = require('ftp-get');
 var fs = require('fs');
 var exec = require('child_process').exec;
 var save_to_dir = config.save_to_dir + 'precipitation/chirps/'
-var aggregate_raster = require('../aggregate_raster_by_all_countries');
+// var aggregate_raster = require('../aggregate_raster_by_all_countries');
 
 var parser = new ArgumentParser({
   version: '0.0.1',
@@ -36,6 +36,7 @@ function download(obj) {
       function(callback) {
         // Check if zipped raster has been downloaded
         // If not, download it and save to rasters save directory.
+        console.log('Does', obj.dir + obj.file_name, 'exist?')
         fs.exists(obj.dir + obj.file_name, function(exists) {
           if (!exists) {
             console.log('gzip does not exist');
@@ -53,6 +54,7 @@ function download(obj) {
       },
 
       function(callback) {
+
         // Unzip raster to another directory to be imported to postgres
         var command = 'gunzip -c ' + raster_store + obj.file_name + ' > ' + save_to_dir + obj.file_name.replace(/.gz/, '') ;
         exec(command, (err, stdout, stderr) => {
@@ -69,20 +71,24 @@ function download(obj) {
       //     callback();
       //   })
       // },
-      // function(callback) {
-      //   var command = 'node aggregate_raster_by_all_countries.js --tif ' + obj.day + ' -s chirps -k precipitation -m mean';
-      //   console.log(command);
-      //   exec(command, {maxBuffer: 8192 * 5000}, (err, stdout, stderr) => {
-      //     if (err) {
-      //       console.error(err);
-      //     }
-      //     callback();
-      //   });
-      // },
+      function(callback) {
+
+        var command = 'node aggregate_raster_by_all_countries.js --tif ' + obj.day + ' -s chirps -k precipitation -m mean';
+        console.log(command);
+
+        exec(command, {maxBuffer: 8192 * 5000}, (err, stdout, stderr) => {
+          if (err) {
+            console.error(err);
+          }
+          callback();
+        });
+      },
 
       function(callback) {
+
         var command = 'rm ' + save_to_dir + obj.file_name.replace(/.gz/, '');
         console.log(command);
+
         exec(command, (err, stdout, stderr) => {
           if (err) {
             console.error(err);
@@ -121,7 +127,9 @@ while(c < total_days) {
   )
   c++;
 }
+
 bluebird.each(dates, (obj, index) => {
+
   return download(obj);
 }, {concurrency: 1})
 .then(() => {
