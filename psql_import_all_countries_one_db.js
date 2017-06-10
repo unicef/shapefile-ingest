@@ -1,5 +1,5 @@
 // Imports highest granularity of admin per country to a single psql database.
-// node psql_import_all_countries_one_db.js -d shapefiles
+// node psql_import_all_countries_one_db.js -s gadm2-8
 var config = require('./config');
 var ArgumentParser = require('argparse').ArgumentParser;
 var fs = require('fs');
