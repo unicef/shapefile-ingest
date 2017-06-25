@@ -1,4 +1,5 @@
 // node shapefile_to_geojson -s gadm2-8
+// node shapefile_to_geojson -s gadm2-8 -p true
 var ArgumentParser = require('argparse').ArgumentParser;
 var bluebird = require('bluebird');
 var config = require('./config');
@@ -19,10 +20,17 @@ parser.addArgument(
   {help: 'Shapefile source. Example: gadm2-8'}
 );
 
+parser.addArgument(
+  ['-p', '--properties_only'],
+  {help: 'Properties only, no coordinates'}
+);
+
 var args = parser.parseArgs();
 var source = args.source;
+var just_properties = args.properties_only;
 var shapefile_dir = config.shapefile_dir + source + '/';
-var geojson_dir = config.geojson_dir + source;
+var geojson_dir = (just_properties ? config.geo_properties_dir : config.geojson_dir) + source;
+
 var shapefile_dirs = fs.readdirSync(shapefile_dir);
 
 bluebird.each(shapefile_dirs, country => {
@@ -64,6 +72,12 @@ function geojsonize(country_code, admin_level) {
     if (fs.existsSync(input)) {
       var ogr = ogr2ogr(input);
       ogr.exec((er, data) => {
+        var content;
+        if (just_properties) {
+          content = data.features.map(e => {return e.properties;});
+        } else {
+          content = data;
+        }
         fs.writeFile(output, JSON.stringify(data), function(err) {
           if (err) throw err;
           console.log('Finished with', country_code, admin_level)
