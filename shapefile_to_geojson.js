@@ -78,7 +78,7 @@ function geojsonize(country_code, admin_level) {
         } else {
           content = data;
         }
-        fs.writeFile(output, JSON.stringify(data), function(err) {
+        fs.writeFile(output, JSON.stringify(content), function(err) {
           if (err) throw err;
           console.log('Finished with', country_code, admin_level)
           resolve();
