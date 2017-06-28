@@ -10,6 +10,7 @@ var aggregations_dir = config.aggregations_dir;
 var save_to_dir = config.save_to_dir;
 var save_raster_dir = config.save_raster_dir;
 var table_names = require('./shared/table_names');
+var jsonfile = require('jsonfile');
 // var command = 'psql -l -t | cut -d'|' -f1 ';
 var command = "psql -lqt  | grep _";
 var pg_config = config.pg_config;
@@ -99,25 +100,46 @@ function scan_raster(country, admin_table, tif_file) {
       });
       // After all data is returned, close connection and return results
       query.on('end', () => {
-        var pop_sum = parseInt(results.reduce((s, r) => { return s + r.sum }, 0));
-        var kilo_sum = parseInt(results.reduce((s, r) => { return s + r.kilometers}, 0));
-        var file = save_to_dir + 'population/' + tif_source + '/' + shapefile_source + '/' +
-        admin_table.replace(/^admin/, country) +
-        '^' + tif_file +
-        '^' + tif_source +
-        '^' + pop_sum +
-        '^' + kilo_sum +
-        '.json';
-        console.log(file);
-        fs.writeFile(file,
-        JSON.stringify(results), (err) => {
-          if (err) console.log(err)
-          console.log('done!', country, admin_table)
-          done();
-          return resolve(country);
-        });
+        form_filename(country, results)
+        .then(filename => {
+          fs.writeFile(file,
+          JSON.stringify(results), (err) => {
+            if (err) console.log(err)
+            console.log('done!', country, admin_table)
+            done();
+            return resolve(country);
+          });
+        })
       });
     });
+  })
+}
+
+function form_filename(country, results) {
+  return new Promise((resolve, reject) => {
+    var pop_sum = parseInt(results.reduce((s, r) => { return s + r.sum }, 0));
+    var kilo_sum_overlay = parseInt(results.reduce((s, r) => { return s + r.kilometers}, 0));
+    var kilo_sum_actual = get_area_from_geojson(country);
+    var file = save_to_dir + 'population/' + tif_source + '/' + shapefile_source + '/' +
+    admin_table.replace(/^admin/, country) +
+    '^' + tif_file +
+    '^' + tif_source +
+    '^' + pop_sum +
+    '^' + kilo_sum_overlay +
+    '^' + kilo_sum_actual +
+    '.json';
+  })
+}
+
+function get_area_from_geojson(country) {
+  return new Promise((resolve, reject) => {
+    // var = geo_properties = require(config.geojson_properties_dir + country + '_0.json');
+    jsonfile.readFile(config.geojson_properties_dir + country + '_0.json', (err, obj) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(obj[0].SQKM);
+    })
   })
 }
 
