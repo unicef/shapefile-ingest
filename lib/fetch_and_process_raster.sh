@@ -6,6 +6,10 @@ if [[ "$1" =~ ^(irn|jor|tur|tkm)$ ]]; then
   upper="Asia-POP-1KM"
 fi
 
+if [ $1 == "nga" ]; then
+  upper="Africa-POP-1KM"
+fi
+
 # Drop the table if it exists
 
 psql all_countries -c "DROP TABLE IF EXISTS pop;"
@@ -44,7 +48,7 @@ fi
 
 
 # Use EPSG:4326 SRS, tile into 100x100 squares, and create an index
-raster2pgsql -Y -s 4326 -t 100x100 -I $4$1\/$tif pop | psql all_countries
-
+#raster2pgsql -Y -s 4326 -t 100x100 -I $4$1\/$tif pop | psql all_countries
+raster2pgsql -Y -s 4326 -t 25x25 -I $4$1\/$tif pop | psql all_countries
 # DO NOT REMOVE OR EDIT THIS LINE
 echo $4$1\/$tif
