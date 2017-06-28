@@ -100,9 +100,9 @@ function scan_raster(country, admin_table, tif_file) {
       });
       // After all data is returned, close connection and return results
       query.on('end', () => {
-        form_filename(country, shapefile_source, admin_table, tif_file, results);
+        form_filename(country, shapefile_source, admin_table, tif_file, results)
         .then(filename => {
-          fs.writeFile(file,
+          fs.writeFile(filename,
           JSON.stringify(results), (err) => {
             if (err) console.log(err)
             console.log('done!', country, admin_table)
@@ -121,7 +121,7 @@ function form_filename(country, shapefile_source, admin_table, tif_file, results
     .then(kilo_sum_actual => {
       var pop_sum = parseInt(results.reduce((s, r) => { return s + r.sum }, 0));
       var kilo_sum_overlay = parseInt(results.reduce((s, r) => { return s + r.kilometers}, 0));
-      var kilo_sum_actual = get_area_from_geojson(country);
+      console.log(kilo_sum_overlay, kilo_sum_actual); 
       var file = save_to_dir + 'population/' + tif_source + '/' + shapefile_source + '/' +
       admin_table.replace(/^admin/, country) +
       '^' + tif_file +
@@ -130,6 +130,7 @@ function form_filename(country, shapefile_source, admin_table, tif_file, results
       '^' + kilo_sum_overlay +
       '^' + kilo_sum_actual +
       '.json';
+      resolve(file);
     })
   })
 }
