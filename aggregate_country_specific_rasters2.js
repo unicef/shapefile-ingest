@@ -100,7 +100,7 @@ function scan_raster(country, admin_table, tif_file) {
       });
       // After all data is returned, close connection and return results
       query.on('end', () => {
-        form_filename(country, results)
+        form_filename(country, shapefile_source, admin_table, tif_file, results);
         .then(filename => {
           fs.writeFile(file,
           JSON.stringify(results), (err) => {
@@ -115,26 +115,29 @@ function scan_raster(country, admin_table, tif_file) {
   })
 }
 
-function form_filename(country, results) {
+function form_filename(country, shapefile_source, admin_table, tif_file, results) {
   return new Promise((resolve, reject) => {
-    var pop_sum = parseInt(results.reduce((s, r) => { return s + r.sum }, 0));
-    var kilo_sum_overlay = parseInt(results.reduce((s, r) => { return s + r.kilometers}, 0));
-    var kilo_sum_actual = get_area_from_geojson(country);
-    var file = save_to_dir + 'population/' + tif_source + '/' + shapefile_source + '/' +
-    admin_table.replace(/^admin/, country) +
-    '^' + tif_file +
-    '^' + tif_source +
-    '^' + pop_sum +
-    '^' + kilo_sum_overlay +
-    '^' + kilo_sum_actual +
-    '.json';
+    get_area_from_geojson(country)
+    .then(kilo_sum_actual => {
+      var pop_sum = parseInt(results.reduce((s, r) => { return s + r.sum }, 0));
+      var kilo_sum_overlay = parseInt(results.reduce((s, r) => { return s + r.kilometers}, 0));
+      var kilo_sum_actual = get_area_from_geojson(country);
+      var file = save_to_dir + 'population/' + tif_source + '/' + shapefile_source + '/' +
+      admin_table.replace(/^admin/, country) +
+      '^' + tif_file +
+      '^' + tif_source +
+      '^' + pop_sum +
+      '^' + kilo_sum_overlay +
+      '^' + kilo_sum_actual +
+      '.json';
+    })
   })
 }
 
 function get_area_from_geojson(country) {
   return new Promise((resolve, reject) => {
     // var = geo_properties = require(config.geojson_properties_dir + country + '_0.json');
-    jsonfile.readFile(config.geojson_properties_dir + country + '_0.json', (err, obj) => {
+    jsonfile.readFile(config.geo_properties_dir + 'gadm2-8/' + country + '_0.json', (err, obj) => {
       if (err) {
         return reject(err);
       }
