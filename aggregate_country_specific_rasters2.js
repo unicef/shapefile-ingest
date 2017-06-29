@@ -15,13 +15,48 @@ var jsonfile = require('jsonfile');
 var command = "psql -lqt  | grep _";
 var pg_config = config.pg_config;
 
+var ArgumentParser = require('argparse').ArgumentParser;
+var parser = new ArgumentParser({
+  version: '0.0.1',
+  addHelp: true,
+  description: 'Aggregate a csv of airport by admin 1 and 2'
+});
+
+parser.addArgument(
+  ['-c', '--continue'],
+  {help: 'Continue from last file in save directory'}
+)
+
+var args = parser.parseArgs();
+var continue_from_last = args.continue;
+
+var default_save_dir = save_to_dir + 'population/' + tif_source + '/' + 'gadm2-8'
+var current_country_codes = fs.readdirSync(default_save_dir).map(f => { return f.match(/^[a-z]{3}/)[0]; })
+
 // Get array of 3 letter iso country codes for which a db exists in postgres.
 table_names.country_table_names(pg_config)
 .then(tables => {
-
+  var wanted_country_codes = Object.keys(tables);
+  if (continue_from_last) {
+    wanted_country_codes = wanted_country_codes.filter(c => { current_country_codes.filter(e => { return a.indexOf(e) === -1}); })
+  }
   bluebird.each(Object.keys(tables), (country, i) => {
     return process_tables(country, tables[country]).then(() => {
       // Drop raster from table if exists
+
+      var ArgumentParser = require('argparse').ArgumentParser;
+      var args = parser.parseArgs();
+      var parser = new ArgumentParser({
+        version: '0.0.1',
+        addHelp: true,
+        description: 'Aggregate a csv of airport by admin 1 and 2'
+      });
+
+      parser.addArgument(
+        ['-c', '--continue'],
+        {help: 'Continue from last file in save directory'}
+      )
+      var continue_from_last = args.continue;
       drop_raster_table('all_countries', 'pop');
     });
   }, {concurrency: 1})
@@ -121,7 +156,7 @@ function form_filename(country, shapefile_source, admin_table, tif_file, results
     .then(kilo_sum_actual => {
       var pop_sum = parseInt(results.reduce((s, r) => { return s + r.sum }, 0));
       var kilo_sum_overlay = parseInt(results.reduce((s, r) => { return s + r.kilometers}, 0));
-      console.log(kilo_sum_overlay, kilo_sum_actual); 
+      console.log(kilo_sum_overlay, kilo_sum_actual);
       var file = save_to_dir + 'population/' + tif_source + '/' + shapefile_source + '/' +
       admin_table.replace(/^admin/, country) +
       '^' + tif_file +
