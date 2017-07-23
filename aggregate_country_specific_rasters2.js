@@ -33,7 +33,7 @@ var continue_from_last = args.continue;
 var default_save_dir = save_to_dir + 'population/' + tif_source + '/' + 'gadm2-8'
 var current_country_codes = fs.readdirSync(default_save_dir).map(f => { return f.match(/^[a-z]{3}/)[0]; })
 
-// Get array of 3 letter iso country codes for which a db exists in postgres.
+// Get array of 3 letter iso country codes for which a table exists in postgres.
 table_names.country_table_names(pg_config)
 .then(tables => {
   var wanted_country_codes = Object.keys(tables);
