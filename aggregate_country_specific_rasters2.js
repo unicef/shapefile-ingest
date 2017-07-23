@@ -43,20 +43,6 @@ table_names.country_table_names(pg_config)
   bluebird.each(Object.keys(tables), (country, i) => {
     return process_tables(country, tables[country]).then(() => {
       // Drop raster from table if exists
-
-      var ArgumentParser = require('argparse').ArgumentParser;
-      var args = parser.parseArgs();
-      var parser = new ArgumentParser({
-        version: '0.0.1',
-        addHelp: true,
-        description: 'Aggregate a csv of airport by admin 1 and 2'
-      });
-
-      parser.addArgument(
-        ['-c', '--continue'],
-        {help: 'Continue from last file in save directory'}
-      )
-      var continue_from_last = args.continue;
       drop_raster_table('all_countries', 'pop');
     });
   }, {concurrency: 1})
