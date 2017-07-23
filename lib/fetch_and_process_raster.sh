@@ -34,10 +34,8 @@ if [ ! $tif ]; then
     fbname=$(basename $file)
     echo $fbname
     echo $file
-    echo "____"
     echo $2$3/$1*
     cp $file $4$1/$fbname
-    echo "FFFFF"
     echo $1
     rm -rf $2$3/$1
     rm -rf $2$3/$1/$1.zip
