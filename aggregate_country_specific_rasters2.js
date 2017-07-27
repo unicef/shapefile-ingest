@@ -38,9 +38,9 @@ table_names.country_table_names(pg_config)
 .then(tables => {
   var wanted_country_codes = Object.keys(tables);
   if (continue_from_last) {
-    wanted_country_codes = wanted_country_codes.filter(c => { current_country_codes.filter(e => { return a.indexOf(e) === -1}); })
+    wanted_country_codes = wanted_country_codes.filter(c => {  return current_country_codes.indexOf(c) === -1});
   }
-  bluebird.each(Object.keys(tables), (country, i) => {
+  bluebird.each(wanted_country_codes, (country, i) => {
     return process_tables(country, tables[country]).then(() => {
       // Drop raster from table if exists
       drop_raster_table('all_countries', 'pop');
