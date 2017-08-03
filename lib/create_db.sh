@@ -15,3 +15,6 @@ upper=`echo "$1" | tr /a-z/ /A-Z/`
 psql $1 -c 'DROP TABLE IF EXISTS ' $1 + '_' + $3 + ';'
 
 shp2pgsql -s 4326 -D -I $4/$upper/$2 $1_$3_gadm2-8 | psql $1
+
+
+shp2pgsql -s 4326 -D -I AFG_0.json afg_0 | psql all_countries_one_db
