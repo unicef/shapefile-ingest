@@ -31,18 +31,6 @@ Zipped shape files will be downloaded to directory in data directory.
   // ogr2ogr -f "PostgreSQL" PG:"dbname=all_countries  user=postgres" "mpio.json"  -nln col_2_santiblanko
 `node import_shapefiles_to_postgres.js -s gadm2-8`
 
-
-## Aggregate country specific rasters by admin
-Currently used for aggregating rasters by country from worldpop
-  Foreach country imported during 'Get shapefiles for all countries from gadm.org':
-  - Downloads country specific raster from worldpop
-  - Imports raster to country db as table 'pop' with raster2pgsql
-  - Aggregates pixels by admin region and summarizes square kilometers per admin.
-
-## Aggregate raster by all countries
-  // node aggregate_raster_by_all_countries.js --tif aegypti -s simon_hay -m mean -f gadm2-8
-
-
 ## Convert shapefiles to geojson
 `node shapefile_to_geojson -s gadm2-8`
 
@@ -63,3 +51,6 @@ Currently used for aggregating rasters by country from worldpop
   `rm  ./data/geojson/gadm2-8/VNM_3.json; ogr2ogr -f GeoJSON data/ggeojson/adm2-8/VNM_3.json data/shapefiles/VNM/VNM_adm3.shp`
   `rm  ./data/geojson/gadm2-8/PRT_3.json; ogr2ogr -f GeoJSON data/geojson/gadm2-8/PRT_3.json data/shapefiles/PRT/PRT_adm3.shp`
   `rm  ./data/geojson/gadm2-8/ZAF_4.json; ogr2ogr -f GeoJSON data/geojson/gadm2-8/ZAF_4.json data/shapefiles/ZAF/ZAF_adm4.shp`
+
+
+ogr2ogr -f GeoJSON ./geo./shapefiles/gadm2-8/CHL/CHL_adm0.shp
