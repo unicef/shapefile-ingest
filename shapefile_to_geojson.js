@@ -31,7 +31,7 @@ var just_properties = args.properties_only;
 var shapefile_dir = config.shapefile_dir + source + '/';
 var geojson_dir = (just_properties ? config.geo_properties_dir : config.geojson_dir) + source;
 
-var shapefile_dirs = fs.readdirSync(shapefile_dir);
+var shapefile_dirs = fs.readdirSync(shapefile_dir).filter(f => { return f.match(/[A-Z]{3}/)});
 
 bluebird.each(shapefile_dirs, country => {
   return prepare_to_geojsonize(country);
@@ -70,14 +70,19 @@ function geojsonize(country_code, admin_level) {
   console.log(input, output)
   return new Promise((resolve, reject) => {
     if (fs.existsSync(input)) {
-      var ogr = ogr2ogr(input);
-      ogr.exec((er, data) => {
+      var ogr = ogr2ogr(input).timeout(500000);
+      ogr.exec((err, data) => {
+        if (err) {
+         console.log(err);
+         return resolve(err);
+        }
         var content;
         if (just_properties) {
           content = data.features.map(e => {return e.properties;});
         } else {
           content = data;
         }
+        
         fs.writeFile(output, JSON.stringify(content), function(err) {
           if (err) throw err;
           console.log('Finished with', country_code, admin_level)
